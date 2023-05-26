@@ -54,50 +54,53 @@
 		let touchStartY = 0;
 
 		function direction(event) {
-		let key = event.keyCode;
-		if (key == 37 && dir != "RIGHT") {
-			dir = "LEFT";
-		} else if (key == 38 && dir != "DOWN") {
-			dir = "UP";
-		} else if (key == 39 && dir != "LEFT") {
-			dir = "RIGHT";
-		} else if (key == 40 && dir != "UP") {
-			dir = "DOWN";
-		}
+		  let key = event.keyCode;
+		  if (key == 37 && dir != "RIGHT") {
+		    dir = "LEFT";
+		  } else if (key == 38 && dir != "DOWN") {
+		    dir = "UP";
+		  } else if (key == 39 && dir != "LEFT") {
+		    dir = "RIGHT";
+		  } else if (key == 40 && dir != "UP") {
+		    dir = "DOWN";
+		  }
 		}
 
 		function handleTouchStart(event) {
-		touchStartX = event.touches[0].clientX;
-		touchStartY = event.touches[0].clientY;
+		  touchStartX = event.touches[0].clientX;
+		  touchStartY = event.touches[0].clientY;
 		}
 
 		function handleTouchMove(event) {
-		if (!touchStartX || !touchStartY) {
-			return;
+		  if (!touchStartX || !touchStartY) {
+		    return;
+		  }
+
+		  let touchEndX = event.touches[0].clientX;
+		  let touchEndY = event.touches[0].clientY;
+		  let dx = touchEndX - touchStartX;
+		  let dy = touchEndY - touchStartY;
+
+		  if (Math.abs(dx) > Math.abs(dy)) {
+		    if (dx > 0 && dir != "LEFT") {
+		      dir = "RIGHT";
+		    } else if (dx < 0 && dir != "RIGHT") {
+		      dir = "LEFT";
+		    }
+		  } else {
+		    if (dy > 0 && dir != "UP") {
+		      dir = "DOWN";
+		    } else if (dy < 0 && dir != "DOWN") {
+		      dir = "UP";
+		    }
+		  }
+
+		  touchStartX = 0;
+		  touchStartY = 0;
+
+		  event.preventDefault(); // Prevent default behavior (page reload) when sliding downwards
 		}
 
-		let touchEndX = event.touches[0].clientX;
-		let touchEndY = event.touches[0].clientY;
-		let dx = touchEndX - touchStartX;
-		let dy = touchEndY - touchStartY;
-
-		if (Math.abs(dx) > Math.abs(dy)) {
-			if (dx > 0 && dir != "LEFT") {
-			dir = "RIGHT";
-			} else if (dx < 0 && dir != "RIGHT") {
-			dir = "LEFT";
-			}
-		} else {
-			if (dy > 0 && dir != "UP") {
-			dir = "DOWN";
-			} else if (dy < 0 && dir != "DOWN") {
-			dir = "UP";
-			}
-		}
-
-		touchStartX = 0;
-		touchStartY = 0;
-		}
 
 
 		// checking self touch by snake or not
