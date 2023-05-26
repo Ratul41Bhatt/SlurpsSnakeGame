@@ -46,7 +46,6 @@
 		//controlling the snake
 
 		let dir;
-
 		document.addEventListener("keydown", direction);
 		document.addEventListener("touchstart", handleTouchStart);
 		document.addEventListener("touchmove", handleTouchMove);
@@ -55,7 +54,6 @@
 		let touchStartY = 0;
 
 		function direction(event) {
-		  event.preventDefault();
 		  let key = event.keyCode;
 		  if (key == 37 && dir != "RIGHT") {
 		    dir = "LEFT";
@@ -92,6 +90,7 @@
 		  } else {
 		    if (dy > 0 && dir != "UP") {
 		      dir = "DOWN";
+		      window.scrollTo(0, 0); // Scroll to the top when sliding downwards
 		    } else if (dy < 0 && dir != "DOWN") {
 		      dir = "UP";
 		    }
@@ -99,9 +98,8 @@
 
 		  touchStartX = 0;
 		  touchStartY = 0;
-
-		  event.preventDefault(); // Prevent default behavior (page reload) when sliding downwards
 		}
+
 
 
 
