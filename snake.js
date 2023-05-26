@@ -1,7 +1,7 @@
 		const cvs = document.getElementById("snake");
 		const ctx = cvs.getContext("2d");
                 
-                event.preventDefault();
+                
 		// box pixel 
 		const box = 32;
 
@@ -55,6 +55,7 @@
 		let touchStartY = 0;
 
 		function direction(event) {
+		  event.preventDefault();
 		  let key = event.keyCode;
 		  if (key == 37 && dir != "RIGHT") {
 		    dir = "LEFT";
