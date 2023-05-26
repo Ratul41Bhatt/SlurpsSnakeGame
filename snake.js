@@ -1,209 +1,204 @@
-		const cvs = document.getElementById("snake");
-		const ctx = cvs.getContext("2d");
-                
-                
-		// box pixel 
-		const box = 32;
+const cvs = document.getElementById("snake");
+const ctx = cvs.getContext("2d");
 
-		// load images
+// box pixel
+const box = 32;
 
-		const ground = new Image();
-		ground.src = "image/ground.png";
+// load images
 
-		const foodImg = new Image();
-		foodImg.src = "image/food.png";
+const ground = new Image();
+ground.src = "image/ground.png";
 
-		// load audio files
+const foodImg = new Image();
+foodImg.src = "image/food.png";
 
-		let dead = new Audio();
-		let eat = new Audio();
+// load audio files
 
-		dead.src = "audio/dead.mp3";
-		eat.src = "audio/eat.mp3";
+let dead = new Audio();
+let eat = new Audio();
 
-		// create the snake
+dead.src = "audio/dead.mp3";
+eat.src = "audio/eat.mp3";
 
-		let snake = [];
+// create the snake
 
-		snake[0] = {
-		    x : 9 * box,
-		    y : 10 * box,
-		};
+let snake = [];
 
-		// create the food
+snake[0] = {
+  x: 9 * box,
+  y: 10 * box,
+};
 
-		let food = {
-		    x : Math.floor(Math.random()*17+1) * box,
-		    y : Math.floor(Math.random()*15+3) * box
-		}
+// create the food
 
-		// create the score
+let food = {
+  x: Math.floor(Math.random() * 17 + 1) * box,
+  y: Math.floor(Math.random() * 15 + 3) * box,
+};
 
-		let score = 0;
-		let hit = 0;
+// create the score
 
+let score = 0;
+let hit = 0;
 
-		//controlling the snake
+// controlling the snake
 
-		let dir;
-		document.addEventListener("keydown", direction);
-		document.addEventListener("touchstart", handleTouchStart);
-		document.addEventListener("touchmove", handleTouchMove);
+let dir;
 
-		let touchStartX = 0;
-		let touchStartY = 0;
+document.addEventListener("keydown", direction);
+document.addEventListener("touchstart", handleTouchStart);
+document.addEventListener("touchmove", handleTouchMove);
 
-		function direction(event) {
-		  let key = event.keyCode;
-		  if (key == 37 && dir != "RIGHT") {
-		    dir = "LEFT";
-		  } else if (key == 38 && dir != "DOWN") {
-		    dir = "UP";
-		  } else if (key == 39 && dir != "LEFT") {
-		    dir = "RIGHT";
-		  } else if (key == 40 && dir != "UP") {
-		    dir = "DOWN";
-		  }
-		}
+let touchStartX = 0;
+let touchStartY = 0;
 
-		function handleTouchStart(event) {
-		  touchStartX = event.touches[0].clientX;
-		  touchStartY = event.touches[0].clientY;
-		}
+function direction(event) {
+  let key = event.keyCode;
+  if (key == 37 && dir != "RIGHT") {
+    dir = "LEFT";
+  } else if (key == 38 && dir != "DOWN") {
+    dir = "UP";
+  } else if (key == 39 && dir != "LEFT") {
+    dir = "RIGHT";
+  } else if (key == 40 && dir != "UP") {
+    dir = "DOWN";
+    event.preventDefault(); // Prevent the default behavior of scrolling the page
+  }
+}
 
-		function handleTouchMove(event) {
-		  if (!touchStartX || !touchStartY) {
-		    return;
-		  }
+function handleTouchStart(event) {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+}
 
-		  let touchEndX = event.touches[0].clientX;
-		  let touchEndY = event.touches[0].clientY;
-		  let dx = touchEndX - touchStartX;
-		  let dy = touchEndY - touchStartY;
+function handleTouchMove(event) {
+  if (!touchStartX || !touchStartY) {
+    return;
+  }
 
-		  if (Math.abs(dx) > Math.abs(dy)) {
-		    if (dx > 0 && dir != "LEFT") {
-		      dir = "RIGHT";
-		    } else if (dx < 0 && dir != "RIGHT") {
-		      dir = "LEFT";
-		    }
-		  } else {
-		    if (dy > 0 && dir != "UP") {
-		      dir = "DOWN";
-		      window.scrollTo(0, 0); // Scroll to the top when sliding downwards
-		    } else if (dy < 0 && dir != "DOWN") {
-		      dir = "UP";
-		    }
-		  }
+  let touchEndX = event.touches[0].clientX;
+  let touchEndY = event.touches[0].clientY;
+  let dx = touchEndX - touchStartX;
+  let dy = touchEndY - touchStartY;
 
-		  touchStartX = 0;
-		  touchStartY = 0;
-		}
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0 && dir != "LEFT") {
+      dir = "RIGHT";
+    } else if (dx < 0 && dir != "RIGHT") {
+      dir = "LEFT";
+    }
+  } else {
+    if (dy > 0 && dir != "UP") {
+      dir = "DOWN";
+      window.scrollTo(0, 0); // Scroll to the top when sliding downwards
+      event.preventDefault(); // Prevent the default behavior of scrolling the page
+    } else if (dy < 0 && dir != "DOWN") {
+      dir = "UP";
+    }
+  }
 
+  touchStartX = 0;
+  touchStartY = 0;
+}
 
+// checking self touch by snake or not
+function collision(head, array) {
+  for (let i = 0; i < array.length; i++) {
+    if (head.x == array[i].x && head.y == array[i].y) {
+      return true;
+    }
+  }
+  return false;
+}
 
+// draw everything to the canvas
+function draw() {
+  ctx.drawImage(ground, 0, 72);
 
-		// checking self touch by snake or not
-		function collision(head,array){
-		    for(let i = 0; i < array.length; i++){
-		        if(head.x == array[i].x && head.y == array[i].y){
-		            return true;
-		        }
-		    }
-		    return false;
-		}
+  for (let i = 0; i < snake.length; i++) {
+    ctx.fillStyle = i == 0 ? "#99CC33" : "#99CC33";
+    ctx.fillRect(snake[i].x, snake[i].y, box, box);
 
-		// draw everything to the canvas
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+  }
 
-		function draw(){
-		    
-		    ctx.drawImage(ground,0,72);
-		    
-		    for( let i = 0; i < snake.length ; i++){
-		        ctx.fillStyle = ( i == 0 )? "#99CC33" : "#99CC33";
-		        ctx.fillRect(snake[i].x,snake[i].y,box,box);
-		        
-		        ctx.strokeStyle = "black";
-		        ctx.strokeRect(snake[i].x,snake[i].y,box,box);
-		    }
-		    
-		    ctx.drawImage(foodImg, food.x, food.y);
-		    
-		    // old head position
-		    let snakeX = snake[0].x;
-		    let snakeY = snake[0].y;
-		    
-		    // which direction
-		    if( dir == "LEFT") snakeX -= box;
-		    if( dir == "RIGHT") snakeX += box;
-		    if( dir == "UP") snakeY -= box;
-		    if( dir == "DOWN") snakeY += box;
-		    
-		    // if the snake eats the food
-		    if(snakeX == food.x && snakeY == food.y){
-		        score= score+1;
-		        hit += 1;
-		        eat.play();
-		        food = {
-		            x : Math.floor(Math.random()*17+1) * box,
-		            y : Math.floor(Math.random()*15+3) * box
-		        }
-		        // don't remove the tail
-		    }else{
-		        // remove the tail
-		        snake.pop();
-		    }
-		    
-		    // add new Head
-		    
-		    let newHead = {
-		        x : snakeX,
-		        y : snakeY
-		    }
-		    
-		    // game over
-		   
-		    if(snakeX < box || snakeX > 17 * box || snakeY < 3*box || snakeY > 17*box || collision(newHead,snake))
-		    {
-		        clearInterval(game);
-		        dead.play();
-		        showScoreBoard();
+  ctx.drawImage(foodImg, food.x, food.y);
 
-		        reload();
-		    }
-		    
-		    snake.unshift(newHead);
+  // old head position
+  let snakeX = snake[0].x;
+  let snakeY = snake[0].y;
 
-		    //game speed
-		    let increaseSpeed = false;
+  // which direction
+  if (dir == "LEFT") snakeX -= box;
+  if (dir == "RIGHT") snakeX += box;
+  if (dir == "UP") snakeY -= box;
+  if (dir == "DOWN") snakeY += box;
 
-		    if(hit && hit % 3 === 0 && movement > 100)
-		    {
-		    	hit = 0;
-		    	clearInterval(game);
-		    	movement -= 20;
-		    	game = setInterval(draw, movement);
-		    }
-		   
-		    document.getElementById('scoring').innerHTML = `Score: ${score}`;
-		}
+  // if the snake eats the food
+  if (snakeX == food.x && snakeY == food.y) {
+    score = score + 1;
+    hit += 1;
+    eat.play();
+    food = {
+      x: Math.floor(Math.random() * 17 + 1) * box,
+      y: Math.floor(Math.random() * 15 + 3) * box,
+    };
+    // don't remove the tail
+  } else {
+    // remove the tail
+    snake.pop();
+  }
 
-		//final score
+  // add new Head
+  let newHead = {
+    x: snakeX,
+    y: snakeY,
+  };
 
-		function showScoreBoard(){
-			var end = document.getElementById('end');
-			end.innerHTML = `Score: ${score} <br> Game over ! Grabe a Slurps !!`;
-			end.style.display = "block";
-		}
+  // game over
+  if (
+    snakeX < box ||
+    snakeX > 17 * box ||
+    snakeY < 3 * box ||
+    snakeY > 17 * box ||
+    collision(newHead, snake)
+  ) {
+    clearInterval(game);
+    dead.play();
+    showScoreBoard();
+    reload();
+  }
 
-		//page reload
-		function reload()
-		{
-			setTimeout(() => {
-				window.location.reload();
-			}, 5000)
-		}
+  snake.unshift(newHead);
 
-		// call draw function every 200 ms / speed
-		let movement = 200;
-		let game = setInterval(draw,movement);
+  // game speed
+  let increaseSpeed = false;
+
+  if (hit && hit % 3 === 0 && movement > 100) {
+    hit = 0;
+    clearInterval(game);
+    movement -= 20;
+    game = setInterval(draw, movement);
+  }
+
+  document.getElementById("scoring").innerHTML = `Score: ${score}`;
+}
+
+// final score
+function showScoreBoard() {
+  var end = document.getElementById("end");
+  end.innerHTML = `Score: ${score} <br> Game over! Grab a Slurps!!`;
+  end.style.display = "block";
+}
+
+// page reload
+function reload() {
+  setTimeout(() => {
+    window.location.reload();
+  }, 5000);
+}
+
+// call draw function every 200 ms / speed
+let movement = 200;
+let game = setInterval(draw, movement);
